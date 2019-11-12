@@ -7,7 +7,8 @@ const {
 	GraphQLID,
 	GraphQLInt,
 	GraphQLList,
-	GraphQLNonNull
+	GraphQLNonNull,
+	GraphQLBoolean,
 } = graphql;
 
 // импортируем экземпляры mongoose схемы
@@ -20,6 +21,8 @@ const MovieType = new GraphQLObjectType({
 		id: { type: GraphQLID },
 		name: { type: new GraphQLNonNull(GraphQLString) },
 		genre: { type: new GraphQLNonNull(GraphQLString) },
+		rate: { type: GraphQLInt },
+		isWatched: { type: new GraphQLNonNull(GraphQLBoolean) },
 
 		director: {
 			type: DirectorType,
@@ -35,7 +38,7 @@ const DirectorType = new GraphQLObjectType({
 	fields: () => ({
 		id: { type: GraphQLID },
 		name: { type: new GraphQLNonNull(GraphQLString) },
-		age: { type: new GraphQLNonNull(GraphQLInt) }
+		age: { type: new GraphQLNonNull(GraphQLInt) },
 
 		movies: {
 			type: new GraphQLList(MovieType),
@@ -71,12 +74,16 @@ const Mutation = new GraphQLObjectType({
 				name: { type: new GraphQLNonNull(GraphQLString) },
 				genre: { type: new GraphQLNonNull(GraphQLString) },
 				directorId: { type: GraphQLID },
+				rate: { type: GraphQLInt },
+				isWatched: { type: new GraphQLNonNull(GraphQLBoolean) },
 			},
-			resolve(parent, { name, genre, directorId }) {
+			resolve(parent, { name, genre, directorId, rate, isWatched, }) {
 				const movie = new Movies({
 					name,
 					genre,
 					directorId,
+					isWatched,
+					rate,
 				});
 				return movie.save();
 			}
@@ -125,11 +132,13 @@ const Mutation = new GraphQLObjectType({
 				name: { type: new GraphQLNonNull(GraphQLString) },
 				genre: { type: new GraphQLNonNull(GraphQLString) },
 				directorId: { type: new GraphQLNonNull(GraphQLID) },
+				rate: { type: GraphQLInt },
+				isWatched: { type: new GraphQLNonNull(GraphQLBoolean) },
 			},
-			resolve(parent, { id, name, genre, directorId }) {
+			resolve(parent, { id, name, genre, directorId, rate, isWatched, }) {
 				return Movies.findByIdAndUpdate(
 					id,
-					{ $set: { name, genre, directorId } },
+					{ $set: { name, genre, directorId, rate, isWatched, } },
 					{ new: true },
 				)
 			}
