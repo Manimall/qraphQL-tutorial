@@ -13,7 +13,7 @@ class Directors extends React.Component {
     open: false,
     name: '',
     age: 0,
-  }
+  };
 
   handleClickOpen = (data) => {
     this.setState({

@@ -17,7 +17,7 @@ class DirectorsDialog extends React.Component {
     const { id, handleClose, deleteDirector } = this.props;
     deleteDirector(id);
     handleClose();
-  }
+  };
 
   render() {
     const { open, handleClose } = this.props;
