@@ -14,10 +14,6 @@ import SaveIcon from '@material-ui/icons/Save';
 
 import withHocs from './MoviesFormHoc';
 
-const directors = [
-  { id: 1, name: 'Quentin Tarantino', age: 55, movies: [ { name: 'Movie 1' }, { name: 'Movie 2' } ] },
-  { id: 2, name: 'Guy Ritchie', age: 50, movies: [ { name: 'Movie 1' }, { name: 'Movie 2' } ] }
-];
 
 class MoviesForm extends React.Component {
   handleClose = () => {
@@ -25,14 +21,18 @@ class MoviesForm extends React.Component {
   };
 
   handleSave = () => {
-    const { selectedValue, onClose } = this.props;
-    const { id, name, genre, rate, directorId, watched } = selectedValue;
+    const { selectedValue, onClose, addMovie } = this.props;
+    const { id, name, genre, rate, directorId, isWatched } = selectedValue;
+
+    addMovie({ id, name, genre, rate: Number(rate), directorId, isWatched: Boolean(isWatched) });
+
     onClose();
   };
 
   render() {
-    const { classes, open, handleChange, handleSelectChange, handleCheckboxChange, selectedValue = {} } = this.props;
-    const { name, genre, rate, directorId, watched } = selectedValue;
+    const { data = {}, classes, open, handleChange, handleSelectChange, handleCheckboxChange, selectedValue = {} } = this.props;
+    const { name, genre, rate, directorId, isWatched } = selectedValue;
+    const { directors = [] } = data;
 
     return (
       <Dialog onClose={this.handleClose} open={open} aria-labelledby="simple-dialog-title">
@@ -83,7 +83,7 @@ class MoviesForm extends React.Component {
           </FormControl>
           <div className={classes.wrapper}>
             <FormControlLabel
-              control={<Checkbox checked={watched} onChange={handleCheckboxChange('watched')} value="watched" />}
+              control={<Checkbox checked={isWatched} onChange={handleCheckboxChange('isWatched')} value="isWatched" />}
               label="Watched movie"
             />
             <Button onClick={this.handleSave} variant="contained" color="primary" className={classes.button}>

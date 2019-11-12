@@ -12,7 +12,7 @@ class Movies extends React.Component {
     open: false,
     name: '',
     genre: '',
-    watched: false,
+    isWatched: false,
     rate: 0,
     directorId: '',
   }
@@ -29,7 +29,7 @@ class Movies extends React.Component {
     this.setState({
       name: '',
       genre: '',
-      watched: false,
+      isWatched: false,
       rate: 0,
       directorId: '',
       open: false
@@ -41,12 +41,12 @@ class Movies extends React.Component {
   handleChange = name => ({ target }) => { this.setState({ [name]: target.value }); };
 
   render() {
-    const { id, name, genre, watched, rate, directorId, open } = this.state;
+    const { id, name, genre, isWatched, rate, directorId, open } = this.state;
     const { classes } = this.props;
 
     return (
       <>
-        <MoviesForm handleChange={this.handleChange} handleSelectChange={this.handleSelectChange} handleCheckboxChange={this.handleCheckboxChange} selectedValue={{ id, name, genre, watched, rate, directorId }} open={open} onClose={this.handleClose} />
+        <MoviesForm handleChange={this.handleChange} handleSelectChange={this.handleSelectChange} handleCheckboxChange={this.handleCheckboxChange} selectedValue={{ id, name, genre, isWatched, rate, directorId }} open={open} onClose={this.handleClose} />
         <div className={classes.wrapper}>
           <MoviesTable onOpen={this.handleClickOpen} onClose={this.handleClose} />
           <Fab onClick={() => this.handleClickOpen()} color="primary" aria-label="Add" className={classes.fab}>

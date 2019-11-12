@@ -8,12 +8,16 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import BlockIcon from '@material-ui/icons/Block';
 
+import withHocs from './MovieDialogHoc';
+
+
 class MoviesDialog extends React.Component {
 
   handleDelete = () => {
-    const { id, handleClose } = this.props;
+    const { id, handleClose, deleteMovie } = this.props;
+    deleteMovie(id);
     handleClose();
-  }
+  };
 
   render() {
     const { open, handleClose } = this.props;
@@ -25,7 +29,9 @@ class MoviesDialog extends React.Component {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">{"Are you sire that you want to delete element?"}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">
+          {"Are you sire that you want to delete element?"}
+        </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
             If you click 'Confirm' this element will be removed from data base.
@@ -44,4 +50,4 @@ class MoviesDialog extends React.Component {
   }
 }
 
-export default MoviesDialog;
+export default withHocs(MoviesDialog);
