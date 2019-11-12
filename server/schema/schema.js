@@ -1,6 +1,14 @@
 const graphql = require('graphql');
 
-const { GraphQLObjectType, GraphQLString, GraphQLSchema, GraphQLID, GraphQLInt, GraphQLList } = graphql;
+const {
+	GraphQLObjectType,
+	GraphQLString,
+	GraphQLSchema,
+	GraphQLID,
+	GraphQLInt,
+	GraphQLList,
+	GraphQLNonNull
+} = graphql;
 
 // импортируем экземпляры mongoose схемы
 const Movies = require('../models/movie');
@@ -10,8 +18,8 @@ const MovieType = new GraphQLObjectType({
 	name: 'Movie',
 	fields: () => ({
 		id: { type: GraphQLID },
-		name: { type: GraphQLString },
-		genre: { type: GraphQLString },
+		name: { type: new GraphQLNonNull(GraphQLString) },
+		genre: { type: new GraphQLNonNull(GraphQLString) },
 
 		director: {
 			type: DirectorType,
@@ -26,8 +34,8 @@ const DirectorType = new GraphQLObjectType({
 	name: 'Director',
 	fields: () => ({
 		id: { type: GraphQLID },
-		name: { type: GraphQLString },
-		age: { type: GraphQLInt },
+		name: { type: new GraphQLNonNull(GraphQLString) },
+		age: { type: new GraphQLNonNull(GraphQLInt) }
 
 		movies: {
 			type: new GraphQLList(MovieType),
@@ -36,6 +44,97 @@ const DirectorType = new GraphQLObjectType({
 			}
 		}
 	})
+});
+
+const Mutation = new GraphQLObjectType({
+	name: 'Mutation',
+	fields: {
+		addDirector: {
+			type: DirectorType,
+			args: {
+				name: { type: new GraphQLNonNull(GraphQLString) },
+				age: { type: new GraphQLNonNull(GraphQLInt) }
+			},
+			// с помощью mongoose схемы определяем новую сущность - обьект с именем и возрастом
+			resolve(parent, { name, age }) {
+				const director = new Directors({
+					name,
+					age,
+				});
+				return director.save();
+			},
+		},
+
+		addMovie: {
+			type: MovieType,
+			args: {
+				name: { type: new GraphQLNonNull(GraphQLString) },
+				genre: { type: new GraphQLNonNull(GraphQLString) },
+				directorId: { type: GraphQLID },
+			},
+			resolve(parent, { name, genre, directorId }) {
+				const movie = new Movies({
+					name,
+					genre,
+					directorId,
+				});
+				return movie.save();
+			}
+		},
+
+		deleteDirector: {
+			type: DirectorType,
+			args: {
+				id: { type: GraphQLID }
+			},
+			resolve(parent, { id }) {
+				return Directors.findByIdAndRemove(id)
+			}
+		},
+
+		deleteMovie: {
+			type: MovieType,
+			args: {
+				id: { type: GraphQLID }
+			},
+			resolve(parent, { id }) {
+				return Movies.findByIdAndRemove(id)
+			}
+		},
+
+		updateDirector: {
+			type: DirectorType,
+			args: {
+				id: { type: GraphQLID },
+				name: { type: new GraphQLNonNull(GraphQLString) },
+				age: { type: new GraphQLNonNull(GraphQLInt) }
+			},
+			resolve(parent, { id, name, age }) {
+				return Directors.findByIdAndUpdate(
+					id,
+					{ $set: { name, age } },
+					{ new: true },
+				)
+			}
+		},
+
+		updateMovie: {
+			type: MovieType,
+			args: {
+				id: { type: GraphQLID },
+				name: { type: new GraphQLNonNull(GraphQLString) },
+				genre: { type: new GraphQLNonNull(GraphQLString) },
+				directorId: { type: new GraphQLNonNull(GraphQLID) },
+			},
+			resolve(parent, { id, name, genre, directorId }) {
+				return Movies.findByIdAndUpdate(
+					id,
+					{ $set: { name, genre, directorId } },
+					{ new: true },
+				)
+			}
+		}
+	}
 });
 
 // корневой запрос, содержащий все под-запросы
@@ -78,4 +177,5 @@ const Query = new GraphQLObjectType({
 
 module.exports = new GraphQLSchema({
 	query: Query,
+	mutation: Mutation,
 });
